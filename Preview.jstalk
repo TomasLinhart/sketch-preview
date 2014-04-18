@@ -77,7 +77,11 @@ function getPreviewDirectory() {
 }
 
 function openPreviewFile(previewFilePath) {
-  if(![[NSWorkspace sharedWorkspace] openFile:previewFilePath withApplication:PREVIEW_APPLICATION]]) {
+  var workspace = [NSWorkspace sharedWorkspace];
+  var url = [NSURL fileURLWithPath:[workspace fullPathForApplication:PREVIEW_APPLICATION]];
+  var arguments = [NSArray arrayWithObjects:previewFilePath];
+  var configuration = [NSDictionary dictionaryWithObject:arguments forKey:NSWorkspaceLaunchConfigurationArguments];
+  if (![workspace launchApplicationAtURL:url options:NSWorkspaceLaunchWithoutActivation configuration: error:null]) {
     [doc showMessage:"Failed to open preview file; Make sure '" + PREVIEW_APPLICATION + "' is installed."];
   }
 }
