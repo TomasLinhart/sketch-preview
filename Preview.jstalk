@@ -79,7 +79,9 @@ function getPreviewDirectory() {
 function openPreviewFile(previewFilePath) {
   if(![[NSWorkspace sharedWorkspace] openFile:previewFilePath withApplication:PREVIEW_APPLICATION]]) {
     [doc showMessage:"Failed to open preview file; Make sure '" + PREVIEW_APPLICATION + "' is installed."];
-  }
+  } else {
+    hideAppWithName(PREVIEW_APPLICATION);
+  } 
 }
 
 // Creating the preview directory is unnecessary as of Sketch 2.4.2. I don't
@@ -90,6 +92,24 @@ function openPreviewFile(previewFilePath) {
 function _deprecatedDefensiveDirectoryCreation(fileManager, previewDirectory) {
   if (![fileManager fileExistsAtPath:previewDirectory]) {
     [fileManager createDirectoryAtPath:previewDirectory withIntermediateDirectories:true attributes:nil error:nil];
+  }
+}
+
+function bundleIdentifierForApplicationName(appName) {
+  var workspace = [NSWorkspace sharedWorkspace];
+  var appPath = [workspace fullPathForApplication:appName];
+  if (appPath) {
+      var appBundle = [NSBundle bundleWithPath:appPath];
+      return [appBundle bundleIdentifier];
+  }
+  
+  return null;
+}
+
+function hideAppWithName(appName) {
+  var apps = [NSRunningApplication runningApplicationsWithBundleIdentifier:bundleIdentifierForApplicationName(appName)];
+  if ([apps count] != 0) {
+    [[apps firstObject] hide];
   }
 }
 
